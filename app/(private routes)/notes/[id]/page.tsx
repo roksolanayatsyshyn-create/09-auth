@@ -1,8 +1,16 @@
 import type { Metadata } from 'next';
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import {
+  dehydrate,
+  HydrationBoundary,
+  QueryClient,
+} from '@tanstack/react-query';
+
 import NoteDetailsClient from './NoteDetails.client';
-import { fetchNoteByIdServer, checkServerSession } from '@/lib/api/serverApi';
+import {
+  fetchNoteByIdServer,
+  checkServerSession,
+} from '@/lib/api/serverApi';
 
 type Props = {
   params: { id: string };
@@ -11,17 +19,7 @@ type Props = {
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const cookieStore = await cookies();
-  const cookieHeader = [
-    cookieStore.get('accessToken')?.value &&
-      `accessToken=${cookieStore.get('accessToken')?.value}`,
-    cookieStore.get('refreshToken')?.value &&
-      `refreshToken=${cookieStore.get('refreshToken')?.value}`,
-  ]
-    .filter(Boolean)
-    .join('; ');
-
-  const note = await fetchNoteByIdServer(params.id, cookieHeader);
+  const note = await fetchNoteByIdServer(params.id);
 
   return {
     title: note.title,
@@ -30,21 +28,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function NotePage({ params }: Props) {
-  const cookieStore = await cookies();
-  const cookieHeader = [
-    cookieStore.get('accessToken')?.value &&
-      `accessToken=${cookieStore.get('accessToken')?.value}`,
-    cookieStore.get('refreshToken')?.value &&
-      `refreshToken=${cookieStore.get('refreshToken')?.value}`,
-  ]
-    .filter(Boolean)
-    .join('; ');
-  const session = await checkServerSession(cookieHeader);
-  if (!session) {
+  const session = await checkServerSession();
+  if (!session.data) {
     redirect('/notes/filter/all');
   }
 
-  const note = await fetchNoteByIdServer(params.id, cookieHeader);
+  const queryClient = new QueryClient();
 
-  return <NoteDetailsClient note={note} />;
+  await queryClient.prefetchQuery({
+    queryKey: ['note', params.id],
+    queryFn: () => fetchNoteByIdServer(params.id),
+  });
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <NoteDetailsClient />
+    </HydrationBoundary>
+  );
 }

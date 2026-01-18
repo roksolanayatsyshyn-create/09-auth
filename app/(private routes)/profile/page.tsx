@@ -1,33 +1,62 @@
-import type { Metadata } from 'next';
-import ProfileClient from './ProfilePage.client';
-import { checkServerSession, getMeServer } from '@/lib/api/serverApi';
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
+'use client';
 
-export const metadata: Metadata = {
-  title: 'Profile Page | NoteHub',
-  description: 'View and manage your NoteHub profile information.',
-};
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/lib/store/authStore';
+import { getMe } from '@/lib/api/clientApi';
+import type { User } from '@/types/user';
+import css from './ProfilePage.module.css';
 
-export default async function ProfilePage() {
-  const cookieStore = await cookies();
+export default function ProfilePage() {
+  const setUser = useAuthStore((s) => s.setUser);
+  const router = useRouter();
+  const [user, setLocalUser] = useState<User | null>(null);
 
-  const cookieHeader = [
-    cookieStore.get('accessToken')?.value &&
-      `accessToken=${cookieStore.get('accessToken')?.value}`,
-    cookieStore.get('refreshToken')?.value &&
-      `refreshToken=${cookieStore.get('refreshToken')?.value}`,
-  ]
-    .filter(Boolean)
-    .join('; ');
+  useEffect(() => {
+    async function loadProfile() {
+      try {
+        const me = await getMe();
+        setUser(me);
+        setLocalUser(me);
+      } catch {
+        router.push('/sign-in');
+      }
+    }
 
-  const session = await checkServerSession(cookieHeader);
+    loadProfile();
+  }, [router, setUser]);
 
-  if (!session) {
-    redirect('/auth/signin');
-  }
+  if (!user) return null;
 
-  const user = await getMeServer(cookieHeader);
+  return (
+    <main className={css.mainContent}>
+      <div className={css.profileCard}>
+        <div className={css.header}>
+          <h1 className={css.formTitle}>Profile Page</h1>
+          <button
+            className={css.editProfileButton}
+            onClick={() => router.push('/profile/edit')}
+          >
+            Edit Profile
+          </button>
+        </div>
 
-  return <ProfileClient serverUser={user} />;
+        <div className={css.avatarWrapper}>
+          <Image
+            src={user.avatar ?? '/default-avatar.png'}
+            alt="User Avatar"
+            width={120}
+            height={120}
+            className={css.avatar}
+          />
+        </div>
+
+        <div className={css.profileInfo}>
+          <p>Username: {user.username}</p>
+          <p>Email: {user.email}</p>
+        </div>
+      </div>
+    </main>
+  );
 }

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useAuthStore } from '@/lib/store/authStore';
 import {useRouter} from "next/navigation"
 import { useState } from 'react';
+import { logout } from '@/lib/api/clientApi';
 import css from './AuthNavigation.module.css';
 
 
@@ -15,11 +16,16 @@ const user = useAuthStore((s) => s.user);
 const [redirecting, setRedirecting] = useState(false);
 const router=useRouter()
 
-const handleLogout = () => {
-    clearIsAuthenticated();
-    setUser(null);
-    setRedirecting(true); 
-    router.push('/sign-in');
+const handleLogout =async () => {
+   try {
+      await logout();       
+      clearIsAuthenticated(); 
+      setUser(null);
+      setRedirecting(true);  
+      router.push('/sign-in'); 
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   }
 
   if (redirecting) return null;
