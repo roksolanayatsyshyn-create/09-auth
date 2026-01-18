@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import  AuthNavigation  from "../AuthNavigition/AuthNavigation";
+import  AuthNavigation  from "../AuthNavigation/AuthNavigation";
 
 import css from './Header.module.css';
 
