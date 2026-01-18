@@ -1,0 +1,36 @@
+{
+  "name": "06-notehub-nextjs",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev ",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "format": "prettier --write 'app/**/*.ts*' 'lib/**/*.ts*'"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.90.18",
+    "axios": "^1.13.2",
+    "cookie": "^1.1.1",
+    "formik": "^2.4.9",
+    "next": "^16.1.1",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-paginate": "^8.3.0",
+    "use-debounce": "^10.0.6",
+    "yup": "^1.7.1",
+    "zustand": "^5.0.10"
+  },
+  "devDependencies": {
+    "@types/cookie": "^0.6.0",
+    "@types/node": "^20",
+    "@types/react": "^19.2.8",
+    "@types/react-dom": "^19",
+    "babel-plugin-react-compiler": "1.0.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.1",
+    "prettier": "^3.8.0",
+    "typescript": "^5"
+  }
+}
