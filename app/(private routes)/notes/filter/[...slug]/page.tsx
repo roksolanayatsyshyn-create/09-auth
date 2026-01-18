@@ -4,7 +4,7 @@ import { dehydrate, QueryClient } from '@tanstack/react-query';
 import { HydrationBoundary } from '@tanstack/react-query';
 import NotesClient from '@/app/(private routes)/notes/filter/[...slug]/Notes.client';
 import { fetchNotesServer } from '@/lib/api/serverApi';
-import { headers } from 'next/headers';
+
 
 export const dynamic = 'force-dynamic';
 
@@ -55,14 +55,13 @@ export default async function FilteredNotesPage({
   const tag = slug?.[0] ?? 'all';
   const page = Number(searchParams?.page ?? 1);
   const search = searchParams?.search ?? '';
-  const headersList = await headers();
-  const cookieHeader = headersList.get('cookie') ?? '';
+  
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery({
     queryKey: ['notes', { tag, search, page }],
     queryFn: () =>
-      fetchNotesServer({ search, page, perPage: 12, tag }, cookieHeader),
+      fetchNotesServer({ search, page, perPage: 12, tag }),
   });
 
   const dehydratedState = dehydrate(queryClient);
