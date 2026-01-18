@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const privateRoutes = ['/profile', '/notes'];
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const isPrivate = privateRoutes.some((route) => pathname.startsWith(route));
