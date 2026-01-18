@@ -13,7 +13,7 @@ const roboto = Roboto({
   display: 'swap',
   subsets: ['latin'],
 });
-export const metadataBase = new URL('http://localhost:3000');
+export const metadataBase = new URL('https://09-auth-orcin-zeta.vercel.app/');
 export const metadata: Metadata = {
   title: {
     default: 'NoteHub App',
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'NoteHub App',
     description: 'Create, organize and filter your notes easily with NoteHub.',
-    url: '/',
+    url: 'https://09-auth-orcin-zeta.vercel.app/',
     images: [
       {
         url: 'https://ac.goit.global/fullstack/react/notehub-og-meta.jpg',
