@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkServerSession } from '@/lib/api/serverApi';
-import {cookies} from "next/headers"
+import { cookies } from 'next/headers';
 
 const privateRoutes = ['/profile', '/notes'];
 const authRoutes = ['/sign-in', '/sign-up'];
@@ -8,7 +8,7 @@ const authRoutes = ['/sign-in', '/sign-up'];
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-   const cookieStore = await cookies();
+  const cookieStore = await cookies();
   const accessToken = cookieStore.get('accessToken')?.value;
   const refreshToken = cookieStore.get('refreshToken')?.value;
 
@@ -16,7 +16,6 @@ export async function proxy(request: NextRequest) {
   const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
 
   if (isPrivate) {
-  
     if (!accessToken && !refreshToken) {
       return NextResponse.redirect(new URL('/sign-in', request.url));
     }
@@ -29,7 +28,20 @@ export async function proxy(request: NextRequest) {
           return NextResponse.redirect(new URL('/sign-in', request.url));
         }
 
-        return NextResponse.next();
+        const response = NextResponse.next();
+        const setCookieHeader = session.headers['set-cookie'];
+
+        if (setCookieHeader) {
+          const cookiesArray = Array.isArray(setCookieHeader)
+            ? setCookieHeader
+            : [setCookieHeader];
+
+          cookiesArray.forEach((cookie) => {
+            response.headers.append('set-cookie', cookie);
+          });
+        }
+
+        return response;
       } catch {
         return NextResponse.redirect(new URL('/sign-in', request.url));
       }
@@ -38,13 +50,8 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  if (isAuthRoute) {
-    if (accessToken) {
-     
-      return NextResponse.redirect(new URL('/', request.url));
-    }
-    
-    return NextResponse.next();
+  if (isAuthRoute && accessToken) {
+    return NextResponse.redirect(new URL('/', request.url));
   }
 
   return NextResponse.next();
