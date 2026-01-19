@@ -13,13 +13,15 @@ import {
 } from '@/lib/api/serverApi';
 
 type Props = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const note = await fetchNoteByIdServer(params.id);
+
+  const { id } = await params;
+  const note = await fetchNoteByIdServer(id);
 
   return {
     title: note.title,
@@ -28,6 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function NotePage({ params }: Props) {
+  const { id } = await params;
   const session = await checkServerSession();
   if (!session.data) {
     redirect('/notes/filter/all');
@@ -36,8 +39,8 @@ export default async function NotePage({ params }: Props) {
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery({
-    queryKey: ['note', params.id],
-    queryFn: () => fetchNoteByIdServer(params.id),
+    queryKey: ['note', id],
+    queryFn: () => fetchNoteByIdServer(id),
   });
 
   return (

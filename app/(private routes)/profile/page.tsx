@@ -1,45 +1,33 @@
-'use client';
-
+import type { Metadata } from 'next';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/lib/store/authStore';
-import { getMe } from '@/lib/api/clientApi';
-import type { User } from '@/types/user';
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { getMeServer } from '@/lib/api/serverApi';
 import css from './ProfilePage.module.css';
 
-export default function ProfilePage() {
-  const setUser = useAuthStore((s) => s.setUser);
-  const router = useRouter();
-  const [user, setLocalUser] = useState<User | null>(null);
+export const metadata: Metadata = {
+  title: 'Profile Page | NoteHub',
+  description: 'View and manage your NoteHub profile information.',
+};
 
-  useEffect(() => {
-    async function loadProfile() {
-      try {
-        const me = await getMe();
-        setUser(me);
-        setLocalUser(me);
-      } catch {
-        router.push('/sign-in');
-      }
-    }
+export default async function ProfilePage() {
+  let user;
 
-    loadProfile();
-  }, [router, setUser]);
-
-  if (!user) return null;
+  try {
+    user = await getMeServer();
+  } catch {
+    redirect('/sign-in');
+  }
 
   return (
     <main className={css.mainContent}>
       <div className={css.profileCard}>
         <div className={css.header}>
           <h1 className={css.formTitle}>Profile Page</h1>
-          <button
-            className={css.editProfileButton}
-            onClick={() => router.push('/profile/edit')}
-          >
+
+          <Link href="/profile/edit" className={css.editProfileButton}>
             Edit Profile
-          </button>
+          </Link>
         </div>
 
         <div className={css.avatarWrapper}>
