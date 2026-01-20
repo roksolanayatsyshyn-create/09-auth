@@ -59,7 +59,11 @@ export async function proxy(request: NextRequest) {
 
   if (isPrivateRoute) {
     if (!accessToken) {
-      return NextResponse.redirect(new URL('/sign-in', request.url));
+      return NextResponse.redirect(new URL('/sign-in', request.url), {
+  headers: {
+    Cookie: cookieStore.toString(),
+  },
+});
     }
 
     return NextResponse.next({
