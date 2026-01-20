@@ -16,8 +16,9 @@ export default function AuthProvider({ children }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
 
-  const setUser = useAuthStore.getState().setUser;
-  const clearIsAuthenticated = useAuthStore.getState().clearIsAuthenticated;
+  const setUser = useAuthStore((s) => s.setUser);
+const clearIsAuthenticated = useAuthStore((s) => s.clearIsAuthenticated);
+
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -54,7 +55,7 @@ export default function AuthProvider({ children }: Props) {
 
     setLoading(true);
     checkAuth();
-  }, [pathname, router]);
+  }, [pathname, router,setUser,clearIsAuthenticated]);
 
   if (loading) {
     return <p>Checking session...</p>;
