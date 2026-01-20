@@ -11,6 +11,7 @@ export async function proxy(request: NextRequest) {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get('accessToken')?.value;
   const refreshToken = cookieStore.get('refreshToken')?.value;
+ let sessionRefreshed = false;
 
   const isPrivate = privateRoutes.some((route) => pathname.startsWith(route));
   const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route));
@@ -27,7 +28,7 @@ export async function proxy(request: NextRequest) {
         if (!session.data) {
           return NextResponse.redirect(new URL('/sign-in', request.url));
         }
-
+        sessionRefreshed = true;
         const response = NextResponse.next();
         const setCookieHeader = session.headers['set-cookie'];
 
@@ -50,7 +51,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  if (isAuthRoute && accessToken) {
+  if (isAuthRoute && accessToken&&!sessionRefreshed) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
