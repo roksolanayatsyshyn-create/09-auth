@@ -17,45 +17,46 @@ export default function AuthProvider({ children }: Props) {
   const [loading, setLoading] = useState(true);
 
   const setUser = useAuthStore((s) => s.setUser);
-const clearIsAuthenticated = useAuthStore((s) => s.clearIsAuthenticated);
-
+  const clearIsAuthenticated = useAuthStore((s) => s.clearIsAuthenticated);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const isPrivate = PRIVATE_ROUTES.some((r) => pathname.startsWith(r));
-
-      if (!isPrivate) {
-        setLoading(false);
-        return;
-      }
-
+    const initAuth = async () => {
       try {
+       
         const isAuthenticated = await checkSession();
 
-        if (!isAuthenticated) {
+        if (isAuthenticated) {
+          
+          const user = await getMe();
+          if (user) setUser(user);
+        } else {
+          
+          const isPrivate = PRIVATE_ROUTES.some((r) =>
+            pathname.startsWith(r)
+          );
+          if (isPrivate) {
+            clearIsAuthenticated();
+            router.replace('/sign-in');
+            return;
+          }
+        }
+      } catch  {
+        const isPrivate = PRIVATE_ROUTES.some((r) =>
+          pathname.startsWith(r)
+        );
+        if (isPrivate) {
           clearIsAuthenticated();
-          router.replace('/');
+          router.replace('/sign-in');
           return;
         }
-
-        const user = await getMe();
-        if (user) {
-          setUser(user);
-        } else {
-          clearIsAuthenticated();
-          router.replace('/');
-        }
-      } catch {
-        clearIsAuthenticated();
-        router.replace('/');
       } finally {
         setLoading(false);
       }
     };
 
     setLoading(true);
-    checkAuth();
-  }, [pathname, router,setUser,clearIsAuthenticated]);
+    initAuth();
+  }, [pathname, router, setUser, clearIsAuthenticated]);
 
   if (loading) {
     return <p>Checking session...</p>;
