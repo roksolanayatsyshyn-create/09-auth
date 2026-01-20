@@ -7,10 +7,7 @@ import {
 } from '@tanstack/react-query';
 
 import NoteDetailsClient from './NoteDetails.client';
-import {
-  fetchNoteByIdServer,
-  checkServerSession,
-} from '@/lib/api/serverApi';
+import { fetchNoteByIdServer, checkServerSession } from '@/lib/api/serverApi';
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -19,7 +16,6 @@ type Props = {
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-
   const { id } = await params;
   const note = await fetchNoteByIdServer(id);
 

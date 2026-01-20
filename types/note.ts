@@ -1,4 +1,14 @@
-export type Tag = 'Todo' | 'Work' | 'Personal' | 'Meeting' | 'Shopping' | 'Ideas' | 'Travel' | 'Finance' | 'Health' | 'Important';
+export type Tag =
+  | 'Todo'
+  | 'Work'
+  | 'Personal'
+  | 'Meeting'
+  | 'Shopping'
+  | 'Ideas'
+  | 'Travel'
+  | 'Finance'
+  | 'Health'
+  | 'Important';
 
 export interface Note {
   id: string;
@@ -9,7 +19,7 @@ export interface Note {
   tag: Tag;
 }
 
-export interface NoteData{
+export interface NoteData {
   title: string;
   content: string;
   tag: Tag;
@@ -19,4 +29,3 @@ export interface FetchNotesResponse {
   notes: Note[];
   totalPages: number;
 }
-

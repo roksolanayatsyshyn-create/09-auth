@@ -4,11 +4,10 @@ import css from './Modal.module.css';
 
 type ModalProps = {
   children: React.ReactNode;
-  onClose:()=>void;
+  onClose: () => void;
 };
 
-export function Modal({ children,onClose }: ModalProps) {
- 
+export function Modal({ children, onClose }: ModalProps) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -29,11 +28,7 @@ export function Modal({ children,onClose }: ModalProps) {
 
   return (
     <div className={css.backdrop} onClick={handleBackdropClick}>
-      <div className={css.modal}>
-        
-        {children}
-        </div>
+      <div className={css.modal}>{children}</div>
     </div>
-    
   );
 }

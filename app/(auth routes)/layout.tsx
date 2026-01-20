@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import type { ReactNode } from 'react';
 import { useEffect } from 'react';
@@ -9,7 +9,7 @@ interface AuthLayoutProps {
 }
 
 export default function AuthLayout({ children }: AuthLayoutProps) {
-  const router=useRouter();
+  const router = useRouter();
   useEffect(() => {
     router.refresh();
   }, [router]);

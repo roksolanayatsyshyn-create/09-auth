@@ -1,15 +1,15 @@
-"use client"
+'use client';
 
 import { useAuthStore } from '@/lib/store/authStore';
-import { checkSession, getMe } from "@/lib/api/clientApi";
-import { useEffect, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { checkSession, getMe } from '@/lib/api/clientApi';
+import { useEffect, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 
 interface Props {
   children: React.ReactNode;
 }
 
-const PRIVATE_ROUTES = ["/profile", "/notes"]; 
+const PRIVATE_ROUTES = ['/profile', '/notes'];
 
 export default function AuthProvider({ children }: Props) {
   const pathname = usePathname();
@@ -17,14 +17,11 @@ export default function AuthProvider({ children }: Props) {
   const [loading, setLoading] = useState(true);
 
   const setUser = useAuthStore.getState().setUser;
-  const clearIsAuthenticated =
-    useAuthStore.getState().clearIsAuthenticated;
+  const clearIsAuthenticated = useAuthStore.getState().clearIsAuthenticated;
 
   useEffect(() => {
     const checkAuth = async () => {
-      const isPrivate = PRIVATE_ROUTES.some((r) =>
-        pathname.startsWith(r)
-      );
+      const isPrivate = PRIVATE_ROUTES.some((r) => pathname.startsWith(r));
 
       if (!isPrivate) {
         setLoading(false);
@@ -36,7 +33,7 @@ export default function AuthProvider({ children }: Props) {
 
         if (!isAuthenticated) {
           clearIsAuthenticated();
-          router.replace("/");
+          router.replace('/');
           return;
         }
 
@@ -45,11 +42,11 @@ export default function AuthProvider({ children }: Props) {
           setUser(user);
         } else {
           clearIsAuthenticated();
-          router.replace("/");
+          router.replace('/');
         }
       } catch {
         clearIsAuthenticated();
-        router.replace("/");
+        router.replace('/');
       } finally {
         setLoading(false);
       }

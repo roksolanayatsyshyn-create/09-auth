@@ -5,7 +5,6 @@ import { HydrationBoundary } from '@tanstack/react-query';
 import NotesClient from '@/app/(private routes)/notes/filter/[...slug]/Notes.client';
 import { fetchNotesServer } from '@/lib/api/serverApi';
 
-
 export const dynamic = 'force-dynamic';
 
 interface PageProps {
@@ -55,13 +54,12 @@ export default async function FilteredNotesPage({
   const tag = slug?.[0] ?? 'all';
   const page = Number(searchParams?.page ?? 1);
   const search = searchParams?.search ?? '';
-  
+
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery({
     queryKey: ['notes', { tag, search, page }],
-    queryFn: () =>
-      fetchNotesServer({ search, page, perPage: 12, tag }),
+    queryFn: () => fetchNotesServer({ search, page, perPage: 12, tag }),
   });
 
   const dehydratedState = dehydrate(queryClient);
