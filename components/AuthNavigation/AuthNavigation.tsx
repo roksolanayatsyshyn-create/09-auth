@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { useAuthStore } from '@/lib/store/authStore';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 import { logout } from '@/lib/api/clientApi';
 import css from './AuthNavigation.module.css';
 
@@ -12,7 +11,7 @@ export default function AuthNavigation() {
   const clearIsAuthenticated = useAuthStore((s) => s.clearIsAuthenticated);
   const setUser = useAuthStore((s) => s.setUser);
   const user = useAuthStore((s) => s.user);
-  const [redirecting, setRedirecting] = useState(false);
+  
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -20,14 +19,12 @@ export default function AuthNavigation() {
       await logout();
       clearIsAuthenticated();
       setUser(null);
-      setRedirecting(true);
       router.push('/sign-in');
     } catch (error) {
       console.error('Logout failed:', error);
     }
   };
 
-  if (redirecting) return null;
   if (isAuthenticated) {
     return (
       <>

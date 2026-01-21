@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
 
 interface PageProps {
   params: Promise<{ slug: string[] }>;
-  searchParams?: { page?: string; search?: string };
+  
 }
 
 export async function generateMetadata({
@@ -47,26 +47,23 @@ export async function generateMetadata({
 }
 
 export default async function FilteredNotesPage({
-  params,
-  searchParams,
+  params
 }: PageProps) {
   const { slug } = await params;
   const tag = slug?.[0] ?? 'all';
-  const page = Number(searchParams?.page ?? 1);
-  const search = searchParams?.search ?? '';
 
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery({
-    queryKey: ['notes', { tag, search, page }],
-    queryFn: () => fetchNotesServer({ search, page, perPage: 12, tag }),
+    queryKey: ['notes',  tag ],
+    queryFn: () => fetchNotesServer({ search:"", page:1, perPage: 12, tag }),
   });
 
   const dehydratedState = dehydrate(queryClient);
 
   return (
     <HydrationBoundary state={dehydratedState}>
-      <NotesClient search={search} page={page} tag={tag} />
+      <NotesClient  tag={tag} />
     </HydrationBoundary>
   );
 }

@@ -20,42 +20,34 @@ export default function AuthProvider({ children }: Props) {
   const clearIsAuthenticated = useAuthStore((s) => s.clearIsAuthenticated);
 
   useEffect(() => {
-    const initAuth = async () => {
+    const checkAuth = async () => {
+      const isPrivate = PRIVATE_ROUTES.some((route) =>
+        pathname.startsWith(route)
+      );
+
+      if (!isPrivate) {
+        setLoading(false);
+        return;
+      }
+
       try {
-       
         const isAuthenticated = await checkSession();
 
         if (isAuthenticated) {
-          
           const user = await getMe();
           if (user) setUser(user);
+          setLoading(false);
         } else {
-          
-          const isPrivate = PRIVATE_ROUTES.some((r) =>
-            pathname.startsWith(r)
-          );
-          if (isPrivate) {
-            clearIsAuthenticated();
-            router.replace('/sign-in');
-            return;
-          }
-        }
-      } catch  {
-        const isPrivate = PRIVATE_ROUTES.some((r) =>
-          pathname.startsWith(r)
-        );
-        if (isPrivate) {
           clearIsAuthenticated();
           router.replace('/sign-in');
-          return;
         }
-      } finally {
-        setLoading(false);
+      } catch {
+        clearIsAuthenticated();
+        router.replace('/sign-in');
       }
     };
 
-    setLoading(true);
-    initAuth();
+    checkAuth();
   }, [pathname, router, setUser, clearIsAuthenticated]);
 
   if (loading) {
