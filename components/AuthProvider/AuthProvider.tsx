@@ -9,8 +9,6 @@ interface Props {
   children: React.ReactNode;
 }
 
-const PRIVATE_ROUTES = ['/profile', '/notes'];
-
 export default function AuthProvider({ children }: Props) {
   const pathname = usePathname();
   const router = useRouter();
@@ -21,29 +19,19 @@ export default function AuthProvider({ children }: Props) {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const isPrivate = PRIVATE_ROUTES.some((route) =>
-        pathname.startsWith(route)
-      );
-
-      if (!isPrivate) {
-        setLoading(false);
-        return;
-      }
-
       try {
         const isAuthenticated = await checkSession();
 
         if (isAuthenticated) {
           const user = await getMe();
           if (user) setUser(user);
-          setLoading(false);
         } else {
           clearIsAuthenticated();
-          router.replace('/sign-in');
         }
       } catch {
         clearIsAuthenticated();
-        router.replace('/sign-in');
+      } finally {
+        setLoading(false);
       }
     };
 

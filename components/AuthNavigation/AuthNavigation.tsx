@@ -11,7 +11,7 @@ export default function AuthNavigation() {
   const clearIsAuthenticated = useAuthStore((s) => s.clearIsAuthenticated);
   const setUser = useAuthStore((s) => s.setUser);
   const user = useAuthStore((s) => s.user);
-  
+
   const router = useRouter();
 
   const handleLogout = async () => {
