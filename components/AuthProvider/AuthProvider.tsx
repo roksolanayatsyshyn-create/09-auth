@@ -8,6 +8,7 @@ import { usePathname, useRouter } from 'next/navigation';
 interface Props {
   children: React.ReactNode;
 }
+const PRIVATE_ROUTES = ['/profile', '/notes'];
 
 export default function AuthProvider({ children }: Props) {
   const pathname = usePathname();
@@ -19,6 +20,13 @@ export default function AuthProvider({ children }: Props) {
 
   useEffect(() => {
     const checkAuth = async () => {
+      const isPrivate = PRIVATE_ROUTES.some((route) => pathname.startsWith(route));
+
+      if (!isPrivate) {
+        setLoading(false);
+        return;
+      }
+
       try {
         const isAuthenticated = await checkSession();
 
@@ -27,9 +35,11 @@ export default function AuthProvider({ children }: Props) {
           if (user) setUser(user);
         } else {
           clearIsAuthenticated();
+          router.replace('/sign-in');
         }
       } catch {
         clearIsAuthenticated();
+        router.replace('/sign-in');
       } finally {
         setLoading(false);
       }
@@ -39,7 +49,7 @@ export default function AuthProvider({ children }: Props) {
   }, [pathname, router, setUser, clearIsAuthenticated]);
 
   if (loading) {
-    return <p>Checking session...</p>;
+    return <p>Checking session...</p>; 
   }
 
   return <>{children}</>;

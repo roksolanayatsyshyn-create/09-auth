@@ -25,7 +25,7 @@ export default function AuthNavigation() {
     }
   };
 
-  if (isAuthenticated) {
+  if (isAuthenticated && user) {
     return (
       <>
         <li className={css.navigationItem}>
